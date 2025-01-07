@@ -1,0 +1,3 @@
+[submodule "PizzaHub"]
+	path = PizzaHub
+	url = https://github.com/YourUserName/PizzaHub.git
