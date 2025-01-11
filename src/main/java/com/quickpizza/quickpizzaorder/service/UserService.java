@@ -3,29 +3,36 @@ package com.quickpizza.quickpizzaorder.service;
 import com.quickpizza.quickpizzaorder.dto.UserRegistrationDTO;
 import com.quickpizza.quickpizzaorder.model.User;
 import com.quickpizza.quickpizzaorder.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
-    public void registerUser(UserRegistrationDTO userRegistrationDTO) {
-        if (userRepository.existsByEmail(userRegistrationDTO.getEmail())) {
-            throw new RuntimeException("User with this email already exists");
+    public User registerUser(UserRegistrationDTO userRegistrationDTO) {
+        // Check if user already exists
+        if (userRepository.findByEmail(userRegistrationDTO.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("User with this email already exists.");
         }
 
+        // Create a new user
         User user = new User();
-        user.setName(userRegistrationDTO.getName());
         user.setEmail(userRegistrationDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
+        user.setName(userRegistrationDTO.getName());
+        user.setRoles(Collections.singletonList("ROLE_USER")); // Pass List<String> for roles
 
-        userRepository.save(user);
+        // Save user to the database
+        return userRepository.save(user);
     }
 }

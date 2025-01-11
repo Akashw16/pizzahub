@@ -6,7 +6,7 @@ public class UserRegistrationDTO {
     private String email;
     private String password;
 
-    // Getters and Setters
+    // Getters and setters
     public String getName() {
         return name;
     }
